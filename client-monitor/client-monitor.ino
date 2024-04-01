@@ -7,6 +7,7 @@ EthernetClient net;
 MQTTClient client;
 
 unsigned long lastMillis = 0;
+const int relayPin = 9;
 
 void connect() {
   Serial.print("Conectando ao servidor MQTT...");
@@ -22,10 +23,19 @@ void connect() {
 
 void messageReceived(String &topic, String &payload) {
   Serial.println("Mensagem recebida: " + topic + " - " + payload);
+
+  if (topic == "/vgarden" && payload == "ON"){
+    digitalWrite(relayPin, HIGH);
+  }
+  if (topic == "/vgarden" && payload == "OFF"){
+    digitalWrite(relayPin, LOW);
+  }
 }
 
 void setup() {
   Serial.begin(9600);
+
+  pinMode(relayPin, OUTPUT);
   
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Falha ao obter o endereço IP via DHCP. Verifique a conexão do cabo e reinicie o Arduino.");
